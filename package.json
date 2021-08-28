@@ -1,0 +1,26 @@
+{
+  "name": "danzr",
+  "version": "1.0.0",
+  "description": "Discord music bot (R.I.P Groovy)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DennisHermes/Danzr.git"
+  },
+  "keywords": [
+    "music",
+    "bot"
+  ],
+  "author": "BaseDen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DennisHermes/Danzr/issues"
+  },
+  "homepage": "https://github.com/DennisHermes/Danzr#readme",
+  "dependencies": {
+    "discord.js": "^13.1.0"
+  }
+}
