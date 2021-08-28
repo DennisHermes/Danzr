@@ -1,26 +1,23 @@
-const { MessageEmbed } = require('discord.js');
+const {client,MessageEmbed} = require('discord.js');
+const fs = require("fs");
 
 module.exports.run = async (bot, message, args) => {
     const exampleEmbed = new MessageEmbed()
 	.setColor('#8DB600')
 	.setTitle('Help')
-	.setAuthor('Danzr', 'https://i.imgur.com/AfFp7pu.png', 'https://discord.js.org')
-	.setDescription('Some description here')
-	.setThumbnail('https://i.imgur.com/AfFp7pu.png')
+    .setDescription('These are all the commands you can use:')
 	.addFields(
-		{ name: 'Regular field title', value: 'Some value here' },
-		{ name: '\u200B', value: '\u200B' },
-		{ name: 'Inline field title', value: 'Some value here', inline: true },
-		{ name: 'Inline field title', value: 'Some value here', inline: true },
+        { name: 'Commands', value: '/help \n/ping \n' },
+        { name: 'Invite', value: 'Danzr can be added to as many servers as you want! [Click here to add it to yours.](https://discord.com/oauth2/authorize?client_id=881089926769283092&scope=bot)' }
 	)
-	.addField('Inline field title', 'Some value here', true)
-	.setImage('https://i.imgur.com/AfFp7pu.png')
+    
 	.setTimestamp()
-	.setFooter('Some footer text here', 'https://i.imgur.com/AfFp7pu.png');
+	.setFooter('Danzr', 'https://i.imgur.com/AfFp7pu.png');
 
 message.channel.send({ embeds: [exampleEmbed] });
 }
 
 module.exports.info = {
-    name: "help"
+    name: "help",
+    description: "A basic help command"
 }
