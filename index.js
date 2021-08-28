@@ -36,8 +36,3 @@ client.on("messageCreate", async message => {
 });
 
 client.login(botConfig.token);
-
-// !! je moet node.js instaleren en dan kan je doen wat hieronder staat
-// !! Voor dennis, om de bot te testen en dus te starten moet je: npm start typen
-// !! we moeten alleen iets hebben wat de bot automatisch runt en zodra je iets upload naar de git repo hij automatisch update
-// !! en mischien dat we beide een aparte test bot aanmaken om te testen en zodra het werkt het toevoegen op danzer
