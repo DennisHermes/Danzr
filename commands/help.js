@@ -12,9 +12,9 @@ module.exports = {
 			.setTitle('**Help**')
 			.setDescription('These are all the commands you can use:')
 			.addFields(
-				{ name: 'Information', value: '/help \n/ping \n/server \n/clear `number`' },
+				{ name: 'Information', value: '/help \n/info \n/clear `amount`' },
 				{ name: 'Music', value: '/play `song or URL`\n/queue \n' },
-				{ name: 'Invite', value: 'Danzr can be added to as many servers as you want! [Click here to add it to yours.](https://discord.com/oauth2/authorize?client_id=881089926769283092&scope=bot)' },
+				{ name: 'Invite', value: 'Danzr can be added to as many servers as you want! [Click here to add it to yours.](https://discord.com/api/oauth2/authorize?client_id=881089926769283092&permissions=139623607872&scope=bot%20applications.commands)' },
 			)
 
 			.setTimestamp()
