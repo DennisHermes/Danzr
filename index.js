@@ -1,6 +1,6 @@
-const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
+const fs = require('fs');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
@@ -13,20 +13,18 @@ for (const file of commandFiles) {
 }
 
 client.once('ready', () => {
-	console.log('Ready!');
+	console.log('[Danzr] Done loading!');
 });
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 
 	const command = client.commands.get(interaction.commandName);
-
 	if (!command) return;
 
 	try {
 		await command.execute(interaction);
-	}
-	catch (error) {
+	} catch (error) {
 		console.error(error);
 		return interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
