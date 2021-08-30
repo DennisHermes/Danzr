@@ -1,8 +1,9 @@
-const { Client, Collection, Intents } = require('discord.js');
+const discord = require('discord.js')
+const { Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
 const fs = require('fs');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new discord.Client({ intents : [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES] , partials : ['CHANNEL', 'MESSAGE']})
 
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -17,6 +18,7 @@ client.once('ready', () => {
 });
 
 client.on('interactionCreate', async interaction => {
+	
 	if (!interaction.isCommand()) return;
 
 	const command = client.commands.get(interaction.commandName);
