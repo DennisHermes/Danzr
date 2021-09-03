@@ -29,6 +29,7 @@ var variables = {
 	queue: queue,
 	player: player,
 	currect: currect,
+	listener: false,
 }
 
 //handle commands

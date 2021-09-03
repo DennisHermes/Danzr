@@ -4,6 +4,10 @@ const yts = require("yt-search");
 const youtube = require('play-dl');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 
+const Youtube = require('simple-youtube-api');
+const { youtubeAPI } = require('../config.json');
+const yt = new Youtube(youtubeAPI);
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('play')
@@ -33,7 +37,15 @@ module.exports = {
             .setDescription(`Analysing request...`);
         await interaction.reply({ embeds: [AnalysingEmbed] });
 
-        if (validedURL(arg)) {
+        if (isURL(arg)) {
+            if (isPlaylistURL(arg)) {
+                const playlist = await yt.getPlaylist(arg);
+                let videosArray = await playlist.getVideos();
+                videosArray.forEach(async element => {
+                    variables.queue.push(element.url);
+                });
+            }
+        } else {
             const SearchingEmbed = new MessageEmbed()
                 .setColor('#8DB600')
                 .setDescription(`Searching for **${arg}**`);
@@ -118,22 +130,34 @@ async function play(songURL, variables) {
     variables.player.play(resource);
     variables.connection.subscribe(variables.player);
 
+
     variables.queue.splice(0, 1);
-    variables.player.on(AudioPlayerStatus.Idle, () => {
-        if (variables.queue.length != 0) {
-            play(variables.queue[0], variables)
-        } else {
-            variables.connection.destroy();
-            variables.connection = null;
-        }
-    });
+    if (!variables.listener) {
+        variables.player.on(AudioPlayerStatus.Idle, () => {
+            variables.listener = true;
+            if (variables.queue.length != 0) {
+                play(variables.queue[0], variables)
+            } else {
+                variables.connection.destroy();
+                variables.connection = null;
+                variables.current = null;
+                variables.listener = false;
+            }
+        });
+    }
 };
 
-async function validedURL(url) {
-    try {
-      new URL(url);
-    } catch (e) {
-      return false;
-    }
-    return true;
-  };
+function isURL(url) {
+    var regExp = /^https?\:\/\/(?:www\.youtube(?:\-nocookie)?\.com\/|m\.youtube\.com\/|youtube\.com\/)?(?:ytscreeningroom\?vi?=|youtu\.be\/|vi?\/|user\/.+\/u\/\w{1,2}\/|embed\/|watch\?(?:.*\&)?vi?=|\&vi?=|\?(?:.*\&)?vi?=)([^#\&\?\n\/<>"']*)/i;
+    var match = url.match(regExp);
+    return (match && match[1].length==11)? match[1] : false;
+}
+
+function isPlaylistURL(url) {
+    var regExp = /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
+        var match = url.match(regExp);
+        if (match && match[2]){
+            return true;
+        }
+        return false;
+}
