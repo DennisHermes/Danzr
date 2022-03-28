@@ -87,22 +87,26 @@ async function play(songURL, variables) {
         tumbnail: songInfo.video_details.thumbnail.url
     };
 
+	console.log(song.title);
+
     variables.currect = song;
 
-    let stream = await youtube.stream(songURL);
-    let resource = createAudioResource(stream.stream, {inputType : stream.type});
-
-    if (!variables.player) variables.player = createAudioPlayer();
-    variables.player.play(resource);
-    variables.connection.subscribe(variables.player);
-
+	try {
+		let stream = await youtube.stream(songURL);
+		let resource = createAudioResource(stream.stream, {inputType : stream.type});
+		if (!variables.player) variables.player = createAudioPlayer();
+		variables.player.play(resource);
+		variables.connection.subscribe(variables.player);
+	} catch {
+		play(variables.queue[0], variables);
+	}
 
     variables.queue.splice(0, 1);
     if (!variables.listener) {
         variables.player.on(AudioPlayerStatus.Idle, () => {
             variables.listener = true;
             if (variables.queue.length != 0) {
-                play(variables.queue[0], variables)
+                play(variables.queue[0], variables);
             } else {
                 loop(variables);
             }
@@ -129,5 +133,5 @@ async function loop(variables) {
 
 	variables.queue = array;
 
-	play(variables.queue[0], variables)
+	play(variables.queue[0], variables);
 }
