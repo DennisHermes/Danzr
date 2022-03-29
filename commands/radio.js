@@ -73,7 +73,11 @@ module.exports = {
 
 			variables.queue = array;
 
-			play(variables.queue[0], variables)
+			try {
+				play(variables.queue[0], variables);
+			} catch {
+				play(variables.queue[0], variables);
+			}
 		}
 	},
 };
@@ -91,22 +95,22 @@ async function play(songURL, variables) {
 
     variables.currect = song;
 
-	try {
-		let stream = await youtube.stream(songURL);
-		let resource = createAudioResource(stream.stream, {inputType : stream.type});
-		if (!variables.player) variables.player = createAudioPlayer();
-		variables.player.play(resource);
-		variables.connection.subscribe(variables.player);
-	} catch {
-		play(variables.queue[0], variables);
-	}
-
+	let stream = await youtube.stream(songURL);
+	let resource = createAudioResource(stream.stream, {inputType : stream.type});
+	if (!variables.player) variables.player = createAudioPlayer();
+	variables.player.play(resource);
+	variables.connection.subscribe(variables.player);
+	
     variables.queue.splice(0, 1);
     if (!variables.listener) {
         variables.player.on(AudioPlayerStatus.Idle, () => {
             variables.listener = true;
             if (variables.queue.length != 0) {
-                play(variables.queue[0], variables);
+                try {
+					play(variables.queue[0], variables);
+				} catch {
+					play(variables.queue[0], variables);
+				}
             } else {
                 loop(variables);
             }
@@ -133,5 +137,9 @@ async function loop(variables) {
 
 	variables.queue = array;
 
-	play(variables.queue[0], variables);
+	try {
+		play(variables.queue[0], variables);
+	} catch {
+		play(variables.queue[0], variables);
+	}
 }
