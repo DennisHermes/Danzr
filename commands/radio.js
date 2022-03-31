@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { AudioPlayerStatus, createAudioResource, createAudioPlayer, joinVoiceChannel } = require('@discordjs/voice');
-const youtube = require('play-dl');
+const { AudioPlayerStatus, createAudioResource, createAudioPlayer, joinVoiceChannel, NoSubscriberBehavior } = require('@discordjs/voice');
 const { MessageEmbed } = require('discord.js');
 
+const youtube = require('play-dl');
 const Youtube = require('simple-youtube-api');
 const { youtubeAPI } = require('../config.json');
 const yt = new Youtube(youtubeAPI);
@@ -15,20 +15,24 @@ module.exports = {
 		.setDescription('Turn on the music'),
 	async execute(interaction, variables) {
 		if (radio) {
+
+			//Turn radio off
 			variables.queue = [];
 			variables.connection.destroy();
 			variables.connection = null;
 			variables.current = null;
+			radio = false;
 			
+			//Sending response
 			const Embed = new MessageEmbed()
             	.setColor('#8DB600')
             	.setDescription(`📻 Radio turned off! 📻`);
         	await interaction.reply({ embeds: [Embed] })
-
-			radio = false;
+			
 		} else {
-			var channel = interaction.member.voice.channel;
 
+			//Checking for user
+			var channel = interaction.member.voice.channel;
 			if (!channel) {
 				const Embed = new MessageEmbed()
             		.setColor('#8DB600')
@@ -37,21 +41,14 @@ module.exports = {
 				return;
 			}
 
+			//Sending response
 			const Embed = new MessageEmbed()
             	.setColor('#8DB600')
             	.setDescription(`📻 Radio turned on! 📻`);
         	await interaction.reply({ embeds: [Embed] })
 
+			//Registering radio player
 			radio = true;
-
-			const URL = "https://www.youtube.com/playlist?list=PLqiOqorfWp7hScCAl0l9YcT1c23ZNsRAf";
-
-			const playlist = await yt.getPlaylist(URL);
-			let videosArray = await playlist.getVideos();
-			videosArray.forEach(async element => {
-				variables.queue.push(element.url);
-			});
-			
 			if (!variables.connection) {
 				variables.connection = joinVoiceChannel({
 					channelId: interaction.member.voice.channelId,
@@ -60,86 +57,52 @@ module.exports = {
 				});
 			}
 
-			var array = variables.queue;
+			//Importing playlist
+			const URL = "https://www.youtube.com/playlist?list=PLqiOqorfWp7hScCAl0l9YcT1c23ZNsRAf";
 
-			var currentIndex = array.length, randomIndex;
-	
+			const playlist = await yt.getPlaylist(URL);
+			let videosArray = await playlist.getVideos();
+			videosArray.forEach(async element => {
+				variables.queue.push(element.url);
+			});
+
+			//Shuffle playlist
+			var shuffledArray = variables.queue;
+			var currentIndex = shuffledArray.length, randomIndex;
 			while (currentIndex != 0) {
 			randomIndex = Math.floor(Math.random() * currentIndex);
 			currentIndex--;
-			[array[currentIndex], array[randomIndex]] = [
-				array[randomIndex], array[currentIndex]];
+			[shuffledArray[currentIndex], shuffledArray[randomIndex]] = [shuffledArray[randomIndex], shuffledArray[currentIndex]];
 			}
+			variables.queue = shuffledArray;
 
-			variables.queue = array;
-
-			try {
-				play(variables.queue[0], variables);
-			} catch {
-				play(variables.queue[0], variables);
-			}
+			//Starting playlist
+			play(variables.queue[0], variables);
 		}
 	},
 };
 
 async function play(songURL, variables) {
-    let songInfo = await youtube.video_info(songURL);
-    song = {
-        title: songInfo.video_details.title,
-        url: songInfo.video_details.url,
-        length: songInfo.video_details.durationRaw,
-        tumbnail: songInfo.video_details.thumbnail.url
-    };
-
-	console.log(song.title);
-
-    variables.currect = song;
 
 	let stream = await youtube.stream(songURL);
-	let resource = createAudioResource(stream.stream, {inputType : stream.type});
-	if (!variables.player) variables.player = createAudioPlayer();
-	variables.player.play(resource);
-	variables.connection.subscribe(variables.player);
-	
+    let resource = createAudioResource(stream.stream, {inputType : stream.type});
+
+    if (!variables.player) variables.player = createAudioPlayer({behaviors: {  noSubscriber: NoSubscriberBehavior.Play }});
+    variables.player.play(resource);
+    variables.connection.subscribe(variables.player);
+
     variables.queue.splice(0, 1);
     if (!variables.listener) {
         variables.player.on(AudioPlayerStatus.Idle, () => {
             variables.listener = true;
             if (variables.queue.length != 0) {
-                try {
-					play(variables.queue[0], variables);
-				} catch {
-					play(variables.queue[0], variables);
-				}
+                play(variables.queue[0], variables);
             } else {
-                loop(variables);
+                variables.connection.destroy();
+                variables.connection = null;
+                variables.current = null;
+                variables.listener = false;
             }
         });
     }
 };
-
-async function loop(variables) {
-	const playlist = await yt.getPlaylist(URL);
-	let videosArray = await playlist.getVideos();
-	videosArray.forEach(async element => {
-		variables.queue.push(element.url);
-	});
-	var array = variables.queue;
-
-	var currentIndex = array.length, randomIndex;
-
-	while (currentIndex != 0) {
-	randomIndex = Math.floor(Math.random() * currentIndex);
-	currentIndex--;
-	[array[currentIndex], array[randomIndex]] = [
-		array[randomIndex], array[currentIndex]];
-	}
-
-	variables.queue = array;
-
-	try {
-		play(variables.queue[0], variables);
-	} catch {
-		play(variables.queue[0], variables);
-	}
-}
