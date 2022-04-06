@@ -38,12 +38,50 @@ module.exports = {
         await interaction.reply({ embeds: [AnalysingEmbed] });
 
         if (isURL(arg)) {
-            if (isPlaylistURL(arg)) {
-                const playlist = await yt.getPlaylist(arg);
-                let videosArray = await playlist.getVideos();
-                videosArray.forEach(async element => {
-                    variables.queue.push(element.url);
+            var queuePosition = "**Currectly playing**";
+            if (variables.player) {
+                queuePosition = `**#${(variables.queue.indexOf(arg) + 1)}** in the queue`;
+            }
+
+            let songInfo = await youtube.video_info(arg);
+            song = {
+                title: songInfo.video_details.title,
+                url: songInfo.video_details.url,
+                length: songInfo.video_details.durationRaw,
+                tumbnail: songInfo.video_details.thumbnail.url
+            };
+
+            const row = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setCustomId('Remove')
+                    .setLabel('Remove Song')
+                    .setStyle('SECONDARY')
+                    .setEmoji('❌'),
+                new MessageButton()
+                    .setCustomId('Jump')
+                    .setLabel('Jump to song')
+                    .setStyle('SECONDARY')
+                    .setEmoji('💨'),
+            );
+            const SongEmbed = new MessageEmbed()
+            .setColor('#8DB600')
+            .setDescription(`**[${song.title}](${song.url})**`)
+            .setThumbnail(`${song.tumbnail}`)
+            .addFields(
+                { name: `:clock1: Duration`, value: `**${song.length}**` },
+                { name: `:placard:  Queue position`, value: `${queuePosition}` },
+            );
+            interaction.editReply({ embeds: [SongEmbed], components: [row] });
+
+            //create a connection
+            if (!variables.connection) {
+                variables.connection = joinVoiceChannel({
+                    channelId: interaction.member.voice.channelId,
+                    guildId: channel.guild.id,
+                    adapterCreator: channel.guild.voiceAdapterCreator,
                 });
+                play(song.url, variables);
             }
         } else {
             const SearchingEmbed = new MessageEmbed()
