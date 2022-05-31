@@ -47,4 +47,4 @@ client.on('interactionCreate', async interaction => {
 });
 
 //Login to discord
-client.login(process.env.token);
+client.login("ODgxMDg5OTI2NzY5MjgzMDky.G7ydqA._dsrf_KqFqhi-DPBh-NQfajdLw0YShRlQkHeJw");

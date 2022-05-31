@@ -2,10 +2,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { AudioPlayerStatus, createAudioResource, createAudioPlayer, joinVoiceChannel, NoSubscriberBehavior } = require('@discordjs/voice');
 const { MessageEmbed } = require('discord.js');
 
-const youtube = require('play-dl');
-const Youtube = require('simple-youtube-api');
-const { youtubeAPI } = require(process.env);
-const yt = new Youtube(youtubeAPI);
+const ytdl = require('ytdl-core');
+const ytfps = require('ytfps');
 
 var radio = false;
 
@@ -59,11 +57,9 @@ module.exports = {
 
 			//Importing playlist
 			const URL = "https://www.youtube.com/playlist?list=PLqiOqorfWp7hScCAl0l9YcT1c23ZNsRAf";
-
-			const playlist = await yt.getPlaylist(URL);
-			let videosArray = await playlist.getVideos();
-			videosArray.forEach(async element => {
-				variables.queue.push(element.url);
+			const playlist = await ytfps(URL);
+			playlist.videos.forEach(async video => {
+				variables.queue.push(video.url);
 			});
 
 			//Shuffle playlist
@@ -83,9 +79,9 @@ module.exports = {
 };
 
 async function play(songURL, variables) {
-
-	let stream = await youtube.stream(songURL);
-    let resource = createAudioResource(stream.stream, {inputType : stream.type});
+	
+	let stream = await ytdl(songURL);
+    let resource = createAudioResource(stream);
 
     if (!variables.player) variables.player = createAudioPlayer({behaviors: {  noSubscriber: NoSubscriberBehavior.Play }});
     variables.player.play(resource);
