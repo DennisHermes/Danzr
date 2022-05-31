@@ -1,7 +1,7 @@
 <h1>🎶 This is a Discord music bot 🎶 </h1>
-</h2>💃 his name is Danzr 💃</h2
+</h2>💃 His name is Danzr 💃</h2
 <br><br><br>
-👨‍💻 this bot is made by:<br>
+👨‍💻 This bot is made by:<br>
 &emsp;&emsp;- DennisHermes <a href="https://www.github.com/DennisHermes" target="_blank">(🔗)</a><br>
 &emsp;&emsp;- Blasix <a href="https://www.github.com/Blasix" target="_blank">(🔗)</a><br>
 <br>
