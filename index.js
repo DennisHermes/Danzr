@@ -1,6 +1,5 @@
 const discord = require('discord.js')
 const { Collection, Intents } = require('discord.js');
-const { token } = require('./config.json');
 const fs = require('fs');
 
 const client = new discord.Client({ intents : [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES] , partials : ['CHANNEL', 'MESSAGE']})
@@ -48,4 +47,4 @@ client.on('interactionCreate', async interaction => {
 });
 
 //Login to discord
-client.login(token);
+client.login(process.env.token);

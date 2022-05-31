@@ -5,7 +5,7 @@ const youtube = require('play-dl');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 
 const Youtube = require('simple-youtube-api');
-const { youtubeAPI } = require('../config.json');
+const { youtubeAPI } = require(process.env);
 const yt = new Youtube(youtubeAPI);
 
 module.exports = {
