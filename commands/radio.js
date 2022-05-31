@@ -80,11 +80,9 @@ module.exports = {
 
 async function play(songURL, variables) {
 	
-	let stream = await ytdl(songURL);
-    let resource = createAudioResource(stream);
-
-    if (!variables.player) variables.player = createAudioPlayer({behaviors: {  noSubscriber: NoSubscriberBehavior.Play }});
-    variables.player.play(resource);
+	const stream = ytdl(songURL, { filter: 'audioonly' });
+    if (!variables.player) variables.player = createAudioPlayer();
+    variables.player.play(stream, { seek: 0, volume: 1 });
     variables.connection.subscribe(variables.player);
 
     variables.queue.splice(0, 1);

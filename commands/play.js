@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { AudioPlayerStatus, createAudioResource, createAudioPlayer, joinVoiceChannel } = require('@discordjs/voice');
-const yts = require("yt-search");
+const ytdl = require('ytdl-core');
+const ytSearch = require('yt-search');
 const youtube = require('play-dl');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 
@@ -86,7 +87,7 @@ module.exports = {
             interaction.editReply({ embeds: [SearchingEmbed] });
 
             //create link from search
-            const {videos} = await yts(arg);
+            const {videos} = await ytSearch(arg);
             if (!videos.length) {
                 const NoSongEmbed = new MessageEmbed()
                     .setColor('#8DB600')
@@ -99,11 +100,12 @@ module.exports = {
         variables.queue.push(songURL);
 
         let songInfo = await youtube.video_info(songURL);
+        console.log(songInfo.video_details.thumbnail);
         song = {
             title: songInfo.video_details.title,
             url: songInfo.video_details.url,
             length: songInfo.video_details.durationRaw,
-            tumbnail: songInfo.video_details.thumbnail.url
+            tumbnail: songInfo.video_details.thumbnail
         };
 
         var queuePosition = "**Currectly playing**";
@@ -127,7 +129,7 @@ module.exports = {
         const SongEmbed = new MessageEmbed()
         .setColor('#8DB600')
         .setDescription(`**[${song.title}](${song.url})**`)
-        .setThumbnail(`${song.tumbnail}`)
+        //.setThumbnail(`${song.tumbnail}`)
         .addFields(
             { name: `:clock1: Duration`, value: `**${song.length}**` },
             { name: `:placard:  Queue position`, value: `${queuePosition}` },
@@ -152,18 +154,15 @@ async function play(songURL, variables) {
         title: songInfo.video_details.title,
         url: songInfo.video_details.url,
         length: songInfo.video_details.durationRaw,
-        tumbnail: songInfo.video_details.thumbnail.url
+        //tumbnail: songInfo.video_details.thumbnail.url
     };
 
     variables.currect = song;
 
-    let stream = await youtube.stream(songURL);
-    let resource = createAudioResource(stream.stream, {inputType : stream.type});
-
+    const stream = ytdl(songURL, { filter: 'audioonly' });
     if (!variables.player) variables.player = createAudioPlayer();
-    variables.player.play(resource);
+    variables.player.play(stream, { seek: 0, volume: 1 });
     variables.connection.subscribe(variables.player);
-
 
     variables.queue.splice(0, 1);
     if (!variables.listener) {
@@ -185,13 +184,4 @@ function isURL(url) {
     var regExp = /^https?\:\/\/(?:www\.youtube(?:\-nocookie)?\.com\/|m\.youtube\.com\/|youtube\.com\/)?(?:ytscreeningroom\?vi?=|youtu\.be\/|vi?\/|user\/.+\/u\/\w{1,2}\/|embed\/|watch\?(?:.*\&)?vi?=|\&vi?=|\?(?:.*\&)?vi?=)([^#\&\?\n\/<>"']*)/i;
     var match = url.match(regExp);
     return (match && match[1].length==11)? match[1] : false;
-}
-
-function isPlaylistURL(url) {
-    var regExp = /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
-        var match = url.match(regExp);
-        if (match && match[2]){
-            return true;
-        }
-        return false;
 }
