@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { AudioPlayerStatus, createAudioResource, createAudioPlayer, joinVoiceChannel, NoSubscriberBehavior } = require('@discordjs/voice');
 const { MessageEmbed } = require('discord.js');
-
-const ytdl = require('ytdl-core');
+const audioconcat = require('audioconcat')
+const playDl = require('play-dl')
 const ytfps = require('ytfps');
 
 var radio = false;
@@ -13,6 +13,8 @@ module.exports = {
 		.setDescription('Turn on the music'),
 	async execute(interaction, variables) {
 		if (radio) {
+
+			interaction = await interaction;
 
 			//Turn radio off
 			variables.queue = [];
@@ -80,23 +82,29 @@ module.exports = {
 
 async function play(songURL, variables) {
 	
-	const stream = ytdl(songURL, { filter: 'audioonly' });
-    if (!variables.player) variables.player = createAudioPlayer();
-    variables.player.play(stream, { seek: 0, volume: 1 });
-    variables.connection.subscribe(variables.player);
+	try {
+		const stream = await playDl.stream(songURL);
+		const resource = createAudioResource(stream.stream, {inputType: stream.type});
+		if (!variables.player) variables.player = createAudioPlayer();
+		variables.player.play(resource, { seek: 0, volume: 1 });
+		variables.connection.subscribe(variables.player);
 
-    variables.queue.splice(0, 1);
-    if (!variables.listener) {
-        variables.player.on(AudioPlayerStatus.Idle, () => {
-            variables.listener = true;
-            if (variables.queue.length != 0) {
-                play(variables.queue[0], variables);
-            } else {
-                variables.connection.destroy();
-                variables.connection = null;
-                variables.current = null;
-                variables.listener = false;
-            }
-        });
-    }
+		variables.queue.splice(0, 1);
+    	if (!variables.listener) {
+			await variables.player.on(AudioPlayerStatus.Idle, () => {
+				variables.listener = true;
+				if (variables.queue.length != 0) {
+					play(variables.queue[0], variables);
+				} else {
+					variables.connection.destroy();
+					variables.connection = null;
+					variables.current = null;
+					variables.listener = false;
+				}
+			});
+    	}
+	} catch (err) {
+		console.log(err);
+		play(variables.queue[0], variables);
+	}
 };
