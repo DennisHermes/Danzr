@@ -42,8 +42,10 @@ client.on('interactionCreate', async interaction => {
 			radio.execute(interaction, variables);
 		} else if (interaction.customId == "NCS") {
 			variables.URL = "https://www.youtube.com/playlist?list=PLRBp0Fe2GpgmsW46rJyudVFlY6IYjFBIK";
+			radio.execute(interaction, variables);
 		} else {
 			variables.URL = "https://www.youtube.com/playlist?list=PLqiOqorfWp7hScCAl0l9YcT1c23ZNsRAf";
+			radio.execute(interaction, variables);
 		}
 	} else if (interaction.isCommand()) {
 		const command = client.commands.get(interaction.commandName);
