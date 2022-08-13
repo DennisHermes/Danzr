@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { AudioPlayerStatus, createAudioResource, createAudioPlayer, joinVoiceChannel, NoSubscriberBehavior } = require('@discordjs/voice');
+const { AudioPlayerStatus, createAudioResource, createAudioPlayer, joinVoiceChannel, } = require('@discordjs/voice');
 const { MessageEmbed } = require('discord.js');
-const audioconcat = require('audioconcat')
 const playDl = require('play-dl')
 const ytfps = require('ytfps');
 
@@ -13,7 +12,6 @@ module.exports = {
 		.setDescription('Turn on the music'),
 	async execute(interaction, variables) {
 		if (radio) {
-
 			interaction = await interaction;
 
 			//Turn radio off
@@ -58,8 +56,7 @@ module.exports = {
 			}
 
 			//Importing playlist
-			const URL = "https://www.youtube.com/playlist?list=PLqiOqorfWp7hScCAl0l9YcT1c23ZNsRAf";
-			const playlist = await ytfps(URL);
+			const playlist = await ytfps(variables.URL);
 			playlist.videos.forEach(async video => {
 				variables.queue.push(video.url);
 			});

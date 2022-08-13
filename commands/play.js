@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { AudioPlayerStatus, createAudioResource, createAudioPlayer, joinVoiceChannel } = require('@discordjs/voice');
+const { AudioPlayerStatus, createAudioPlayer, joinVoiceChannel } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
 const ytSearch = require('yt-search');
 const youtube = require('play-dl');
