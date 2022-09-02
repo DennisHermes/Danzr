@@ -93,7 +93,6 @@ async function play(songURL, variables) {
 				if (variables.queue.length != 0) {
 					play(variables.queue[0], variables);
 				} else {
-					variables.connection.destroy();
 					variables.connection = null;
 					variables.current = null;
 					variables.listener = false;
@@ -102,6 +101,8 @@ async function play(songURL, variables) {
     	}
 	} catch (err) {
 		console.log(err);
+		console.log(variables.queue[0]);
+		variables.queue.splice(0, 1);
 		play(variables.queue[0], variables);
 	}
 };
