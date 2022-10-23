@@ -43,6 +43,9 @@ client.on('interactionCreate', async interaction => {
 		} else if (interaction.customId == "NCS") {
 			variables.URL = "https://www.youtube.com/playlist?list=PLRBp0Fe2GpgmsW46rJyudVFlY6IYjFBIK";
 			radio.execute(interaction, variables);
+		} else if (interaction.customId == "Meme") {
+			variables.URL = "https://www.youtube.com/playlist?list=PLqiOqorfWp7h2wCv7SXDcY5qHEDjX1BvV";
+			radio.execute(interaction, variables);
 		} else {
 			variables.URL = "https://www.youtube.com/playlist?list=PLqiOqorfWp7hScCAl0l9YcT1c23ZNsRAf";
 			radio.execute(interaction, variables);
@@ -88,7 +91,12 @@ client.on('voiceStateUpdate', (newMember) => {
 					.setCustomId('NCS')
 					.setLabel('NCS')
 					.setStyle('SECONDARY')
-					.setEmoji('⛔')
+					.setEmoji('⛔'),
+				new MessageButton()
+					.setCustomId('Meme')
+					.setLabel('Meme')
+					.setStyle('SECONDARY')
+					.setEmoji('😶‍🌫️')
 		);
 		const Embed = new MessageEmbed()
 			.setColor('#8DB600')
