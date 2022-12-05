@@ -64,7 +64,11 @@ client.on('interactionCreate', async interaction => {
 //voice channel join
 client.on('voiceStateUpdate', (newMember) => {
 	if (!newMember.channel) {
+ 
 		let newUserChannel = newMember;
+		
+		if (newUserChannel.member.user.username === "Danzr") return;
+		
 		let greeting = "Goedeavond ";
 
 		var today = new Date();
@@ -106,4 +110,8 @@ client.on('voiceStateUpdate', (newMember) => {
 });
 
 //Login to discord
-client.login(process.env.token);
+const config = require("./config.json");
+var string = JSON.stringify(config);
+var objectValue = JSON.parse(string);
+console.log(objectValue['token']);
+client.login(objectValue['token']);

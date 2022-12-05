@@ -45,34 +45,7 @@ module.exports = {
             	.setDescription(`📻 Radio turned on! 📻`);
         	await interaction.reply({ embeds: [Embed] })
 
-			//Registering radio player
-			radio = true;
-			if (!variables.connection) {
-				variables.connection = joinVoiceChannel({
-					channelId: interaction.member.voice.channelId,
-					guildId: channel.guild.id,
-					adapterCreator: channel.guild.voiceAdapterCreator,
-				});
-			}
-
-			//Importing playlist
-			const playlist = await ytfps(variables.URL);
-			playlist.videos.forEach(async video => {
-				variables.queue.push(video.url);
-			});
-
-			//Shuffle playlist
-			var shuffledArray = variables.queue;
-			var currentIndex = shuffledArray.length, randomIndex;
-			while (currentIndex != 0) {
-			randomIndex = Math.floor(Math.random() * currentIndex);
-			currentIndex--;
-			[shuffledArray[currentIndex], shuffledArray[randomIndex]] = [shuffledArray[randomIndex], shuffledArray[currentIndex]];
-			}
-			variables.queue = shuffledArray;
-
-			//Starting playlist
-			play(variables.queue[0], variables);
+			createList(interaction, variables, channel);
 		}
 	},
 };
@@ -93,9 +66,7 @@ async function play(songURL, variables) {
 				if (variables.queue.length != 0) {
 					play(variables.queue[0], variables);
 				} else {
-					variables.connection = null;
-					variables.current = null;
-					variables.listener = false;
+					createList(variables);
 				}
 			});
     	}
@@ -106,3 +77,34 @@ async function play(songURL, variables) {
 		play(variables.queue[0], variables);
 	}
 };
+
+async function createList(interaction, variables, channel) {
+	//Registering radio player
+	radio = true;
+	if (!variables.connection) {
+		variables.connection = joinVoiceChannel({
+			channelId: interaction.member.voice.channelId,
+			guildId: channel.guild.id,
+			adapterCreator: channel.guild.voiceAdapterCreator,
+		});
+	}
+
+	//Importing playlist
+	const playlist = await ytfps(variables.URL);
+	playlist.videos.forEach(async video => {
+		variables.queue.push(video.url);
+	});
+
+	//Shuffle playlist
+	var shuffledArray = variables.queue;
+	var currentIndex = shuffledArray.length, randomIndex;
+	while (currentIndex != 0) {
+	randomIndex = Math.floor(Math.random() * currentIndex);
+	currentIndex--;
+	[shuffledArray[currentIndex], shuffledArray[randomIndex]] = [shuffledArray[randomIndex], shuffledArray[currentIndex]];
+	}
+	variables.queue = shuffledArray;
+
+	//Starting playlist
+	play(variables.queue[0], variables);
+}
